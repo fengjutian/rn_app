@@ -38,6 +38,7 @@ export function CameraE() {
       style={StyleSheet.absoluteFill}
       device={device}
       isActive={true}
+      photo={true}
     />
   );
 }
