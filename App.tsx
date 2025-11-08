@@ -4,6 +4,7 @@ import {
   SafeAreaProvider,
   // useSafeAreaInsets,
 } from 'react-native-safe-area-context';
+import { CameraE } from './pages/camera';
 
 function App() {
   const isDarkMode = useColorScheme() === 'dark';
@@ -29,6 +30,7 @@ function AppContent() {
         templateFileName="App.tsx"
         safeAreaInsets={safeAreaInsets}
       /> */}
+      <CameraE />
       <ScrollView>
         <Text>Some text</Text>
         <View>
