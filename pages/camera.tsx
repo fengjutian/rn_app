@@ -51,11 +51,14 @@ export function CameraE() {
   }
 
   const takePhoto = async () => {
-    const file = await cameraRef?.current?.takePhoto();
-    await CameraRoll.save(`file://${file.path}`, {
-      type: 'photo',
-    })
-    console.log(2, photo)
+    try {
+      const file = await cameraRef?.current?.takePhoto();
+      if (!file?.path) return;
+      await CameraRoll.saveAsset(`file://${file.path}`, { type: 'photo' });
+      // console.log('Saved to Camera Roll', file.path);
+    } catch (e) {
+      console.warn('Save photo failed', e);
+    }
   }
 
   // 通过上述守卫后，TypeScript 会收窄 device 为 CameraDevice
