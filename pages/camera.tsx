@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import { StyleSheet, View, Text } from 'react-native';
-import { useCameraDevice, useCameraPermission, Camera } from 'react-native-vision-camera';
+import { useCameraDevice, useCameraPermission, Camera, useCameraFormat } from 'react-native-vision-camera';
 
 export function CameraE() {
   const { hasPermission, requestPermission } = useCameraPermission();
@@ -10,7 +10,19 @@ export function CameraE() {
     }
   }, [hasPermission, requestPermission]);
 
-  const device = useCameraDevice('back');
+
+
+  const device = useCameraDevice('back', {
+    physicalDevices: [
+      'ultra-wide-angle-camera',
+      'wide-angle-camera',
+      'telephoto-camera'
+    ]
+  });
+
+  const format = useCameraFormat(device, [
+    { photoResolution: { width: 1280, height: 720 } }
+  ])
 
   if (device == null) return
 
@@ -39,6 +51,7 @@ export function CameraE() {
       device={device}
       isActive={true}
       photo={true}
+      format={format}
     />
   );
 }
