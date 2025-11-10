@@ -1,6 +1,12 @@
-import React, { useEffect } from 'react';
-import { StyleSheet, View, Text } from 'react-native';
-import { useCameraDevice, useCameraPermission, Camera, useCameraFormat } from 'react-native-vision-camera';
+import React, { useEffect, useRef } from 'react';
+import { StyleSheet, View, Text, Pressable } from 'react-native';
+import {
+  useCameraDevice,
+  useCameraPermission,
+  Camera,
+  useCameraFormat,
+ } from 'react-native-vision-camera';
+ import { CameraRoll } from '@react-native-camera-roll/camera-roll'
 
 export function CameraE() {
   const { hasPermission, requestPermission } = useCameraPermission();
@@ -10,7 +16,7 @@ export function CameraE() {
     }
   }, [hasPermission, requestPermission]);
 
-
+   const cameraRef = useRef<Camera>(null)
 
   const device = useCameraDevice('back', {
     physicalDevices: [
@@ -24,7 +30,7 @@ export function CameraE() {
     { photoResolution: { width: 1280, height: 720 } }
   ])
 
-  if (device == null) return
+  // 删除空返回，保持统一的设备守卫逻辑
 
 
   if (!hasPermission) {
@@ -44,15 +50,33 @@ export function CameraE() {
     );
   }
 
+  const takePhoto = async () => {
+    const file = await cameraRef?.current?.takePhoto();
+    await CameraRoll.save(`file://${file.path}`, {
+      type: 'photo',
+    })
+    console.log(2, photo)
+  }
+
   // 通过上述守卫后，TypeScript 会收窄 device 为 CameraDevice
   return (
-    <Camera
-      style={StyleSheet.absoluteFill}
-      device={device}
-      isActive={true}
-      photo={true}
-      format={format}
-    />
+    <View style={{ flex: 1 }}>
+      <Camera
+        ref={cameraRef}
+        style={StyleSheet.absoluteFill}
+        device={device}
+        isActive={true}
+        photo={true}
+        format={format}
+        photoQualityBalance="speed"
+      />
+      <Pressable
+        onPress={takePhoto}
+        style={{ position: 'absolute', bottom: 32, alignSelf: 'center', paddingHorizontal: 20, paddingVertical: 12, backgroundColor: '#fff', borderRadius: 24 }}
+      >
+        <Text style={{ fontSize: 16 }}>拍照</Text>
+      </Pressable>
+    </View>
   );
 }
 
