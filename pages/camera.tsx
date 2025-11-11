@@ -1,5 +1,5 @@
 import React, { useEffect, useRef } from 'react';
-import { StyleSheet, View, Text, Pressable } from 'react-native';
+import { StyleSheet, View, Text, Pressable, PermissionsAndroid, Platform } from 'react-native';
 import {
   useCameraDevice,
   useCameraPermission,
@@ -52,6 +52,27 @@ export function CameraE() {
 
   const takePhoto = async () => {
     try {
+      // Android 运行时权限：根据系统版本选择适配的权限
+      if (Platform.OS === 'android') {
+        if (Platform.Version >= 33) {
+          const granted = await PermissionsAndroid.request(
+            PermissionsAndroid.PERMISSIONS.READ_MEDIA_IMAGES
+          );
+          if (granted !== PermissionsAndroid.RESULTS.GRANTED) {
+            console.warn('权限未授予: READ_MEDIA_IMAGES');
+            return;
+          }
+        } else {
+          const granted = await PermissionsAndroid.request(
+            PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE
+          );
+          if (granted !== PermissionsAndroid.RESULTS.GRANTED) {
+            console.warn('权限未授予: WRITE_EXTERNAL_STORAGE');
+            return;
+          }
+        }
+      }
+
       const file = await cameraRef?.current?.takePhoto();
       if (!file?.path) return;
       await CameraRoll.saveAsset(`file://${file.path}`, { type: 'photo' });
